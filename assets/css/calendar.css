@@ -1,0 +1,66 @@
+.calendar-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.calendar-left { flex-shrink: 0; }
+.calendar-left .vdp {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.calendar-right { padding-top: 0.5rem; flex-grow: 1; min-width: 400px; max-width: 100%; }
+.calendar-right h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+
+input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.event-day { font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; }
+.event-item { margin-top: 0.25rem; list-style-type: disc; margin-left: 1rem; }
+.event-item .title { color: #7c0a0a; font-weight: bold; }
+.event-item .time { margin-left: 0.5rem; color: #111; }
+.event-item .description { font-style: italic; font-size: 0.9rem; }
+
+.no-events-text {
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #444;
+}
+
+/* ===== Extracted from calendar.vue (migrated from <style> to external CSS) ===== */
+.calendar-page { background:#fff; }
+h1 { font-size: 32px; font-weight: 700; margin: 20px 0; color: #7c0a0a; }
+.topbar { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+.search-input { width: 360px; max-width: 100%; padding: 10px 12px; border:1px solid #bbb; border-radius:8px; }
+
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px 40px; align-items: start; }
+.cal-box {}
+.list-box { overflow: auto; max-height: 70vh; }
+
+.event-link { color:#911515; text-decoration:none; transition: color .2s; }
+.event-link:hover { color:#ba2020; text-decoration:underline; }
+
+.event-day { margin-bottom: 24px; }
+.event-day h3 { font-size: 18px; font-weight: 700; margin: 0 0 8px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+.day-events { margin-top: 12px; }
+.day-cell { cursor: pointer; }
+
+.vc-header .vc-arrow {
+  color: #fff;             
+  background: #7c0a0a;     
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+.vc-header .vc-arrow:hover {
+  background: #a01a1a;
+}
