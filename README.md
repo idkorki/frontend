@@ -41,7 +41,7 @@ npm -v
 
 ```bash
 # 1) клонируем
-git clone https://github.com/<yourname>/frontend.git
+git clone https://github.com/idkorki/frontend.git
 cd frontend
 
 # 2) зависимости
