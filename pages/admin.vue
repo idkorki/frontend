@@ -504,6 +504,5 @@ async function deleteEvent(id){
 }
 </script>
 
-<!-- Styles moved to external CSS -->
 <style src="@/assets/css/main.css"></style>
 <style src="@/assets/css/components.css"></style>
