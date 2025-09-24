@@ -7,10 +7,5 @@
   </div>
 </template>
 
-<!-- Styles moved to external CSS -->
 <style src="@/assets/css/main.css"></style>
 <style src="@/assets/css/components.css"></style>
-<!-- Relative-path alternative:
-<style src="../assets/css/main.css"></style>
-<style src="../assets/css/components.css"></style>
--->
