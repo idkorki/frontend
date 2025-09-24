@@ -71,8 +71,6 @@
             <button class="primary-btn" @click="createEvent">Сохранить</button>
           </div>
         </section>
-
-        <!-- Панель редактирования (видна только при выборе события) -->
         <section v-if="editModel" class="card sticky">
           <header class="card-head">
             <h3>Редактирование</h3>
@@ -232,12 +230,18 @@ if (process.client) {
   role.value  = localStorage.getItem('role')  || ''
 }
 const isAuthed = computed(() => !!token.value && role.value === 'admin')
-function hideLogin(){}
+function hideLogin(){
+  // подтянуть актуальные значения после логина из модалки
+  token.value = localStorage.getItem('token') || ''
+  role.value  = localStorage.getItem('role')  || ''
+  // и сразу обновить список
+  loadEvents().catch(()=>{})
+}
 
 /* ===== data ===== */
 const events = ref([])
 async function loadEvents(){
-  const res = await $fetch(`${api}/events`)
+  const res = await $fetch(`${api}/events`, { credentials: 'include' })
   events.value = Array.isArray(res?.items) ? res.items : []
 }
 await loadEvents()
@@ -310,7 +314,6 @@ function parseTime24(text){
   if (h<0 || h>23 || mi<0 || mi>59) return null
   return `${pad(h)}:${pad(mi)}`
 }
-
 
 const onlyDigits = (s) => (s || '').replace(/\D/g, '')
 
@@ -398,6 +401,7 @@ async function createEvent(){
   if (!m.title || !m.date) { toast('Заполни название и дату'); return }
   const created = await $fetch(`${api}/events`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token.value ? { Authorization: `Bearer ${token.value}` } : {})
@@ -446,6 +450,7 @@ async function applyEdit(){
 
   await $fetch(`${api}/events/${m.id}`, {
     method: 'PUT',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token.value ? { Authorization: `Bearer ${token.value}` } : {})
@@ -475,6 +480,7 @@ async function updateStatus(id, status){
   if (!isAuthed.value) return
   await $fetch(`${api}/events/${id}/status`, {
     method: 'PUT',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token.value ? { Authorization: `Bearer ${token.value}` } : {})
@@ -490,6 +496,7 @@ async function deleteEvent(id){
   if (!isAuthed.value || !confirm('Удалить мероприятие?')) return
   await $fetch(`${api}/events/${id}`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: { ...(token.value ? { Authorization: `Bearer ${token.value}` } : {}) }
   })
   events.value = events.value.filter(e => e.id !== id)
@@ -500,7 +507,3 @@ async function deleteEvent(id){
 <!-- Styles moved to external CSS -->
 <style src="@/assets/css/main.css"></style>
 <style src="@/assets/css/components.css"></style>
-<!-- Relative-path alternative:
-<style src="../assets/css/main.css"></style>
-<style src="../assets/css/components.css"></style>
--->

@@ -1,67 +1,66 @@
 <template>
-  <div v-if="show" class="modal-overlay">
+  <div class="modal-backdrop">
     <div class="modal">
-      <h2>Вход в аккаунт</h2>
-      <input v-model="email" placeholder="email" />
-      <input v-model="password" type="password" placeholder="Пароль" />
-      <button @click="login" :disabled="pending">Войти</button>
-      <p v-if="error" class="error-message">{{ error }}</p>
-      <button @click="$emit('close')" class="close-btn">✖</button>
+      <h3 class="modal-title">Войти</h3>
+      <form @submit.prevent="onSubmit" class="form">
+        <input v-model.trim="email" type="email" class="input" placeholder="Email" autocomplete="username" />
+        <input v-model.trim="password" type="password" class="input" placeholder="Пароль" autocomplete="current-password" />
+        <div class="row">
+          <button type="submit" class="primary-btn">Войти</button>
+          <button type="button" class="link-btn" @click="$emit('close')">Отмена</button>
+        </div>
+        <p v-if="error" class="error">{{ error }}</p>
+      </form>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRuntimeConfig } from '#app'
+const emit = defineEmits(['close'])
 
-// ✅ JS: пропсы без типов
-const props = defineProps({
-  show: { type: Boolean, required: true }
-})
-
-// ✅ JS: события без типов
-const emit = defineEmits(['close', 'logged-in'])
-
-const config = useRuntimeConfig()
 const email = ref('')
 const password = ref('')
 const error = ref('')
-const pending = ref(false)
 
-async function login () {
+const config = useRuntimeConfig()
+
+async function onSubmit () {
   error.value = ''
-  pending.value = true
   try {
-    const res = await $fetch(`${config.public.apiBase}/login`, {
+    await $fetch(`${config.public.apiBase}/login`, {
       method: 'POST',
+      credentials: 'include', // <<< отправляем/получаем куку
       headers: { 'Content-Type': 'application/json' },
-      body: { email: email.value, password: password.value }
+      body: { email: email.value, password: password.value } // <<< ИМЕНА ПОЛЕЙ
     })
 
-    // ожидаем: { ok:true, user:{ token, role, email } }
-    if (!res?.ok || !res?.user?.token) {
-      throw new Error(res?.error || 'Неверный логин или пароль')
-    }
+    // помечаем локально, чтобы admin.vue увидел авторизацию
+    localStorage.setItem('role', 'admin')
+    localStorage.setItem('token', 'cookie')
 
-    localStorage.setItem('token', res.user.token)
-    localStorage.setItem('role',  res.user.role  || '')
-    localStorage.setItem('email', res.user.email || '')
-
-    emit('logged-in')   // сообщаем родителю
+    emit('close')
+    // опционально: перезагрузка, если нужно мгновенно подтянуть состояние сессии
+    // location.reload()
   } catch (e) {
-    error.value = e?.message || 'Ошибка входа'
-  } finally {
-    pending.value = false
+    error.value = (e?.data?.message || e?.message || 'Ошибка входа')
   }
 }
 </script>
 
 <style scoped>
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-.modal { background: #fff; padding: 20px; border-radius: 8px; width: 320px; position: relative; }
-input { display: block; width: 100%; margin-bottom: 10px; padding: 8px; }
-button { padding: 8px 12px; margin-top: 5px; }
-.close-btn { position: absolute; top: 5px; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer; }
-.error-message { color: red; margin-top: 10px; }
+.modal-backdrop{
+  position: fixed; inset: 0; background: rgba(0,0,0,.35);
+  display:flex; align-items:center; justify-content:center; z-index:1000;
+}
+.modal{
+  background:#fff; border-radius:12px; padding:20px; width:320px; max-width:90%;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+.modal-title{ font-size:18px; font-weight:600; margin-bottom:12px; }
+.form .input{ width:100%; margin:6px 0; padding:10px; border:1px solid #ccc; border-radius:8px; }
+.row{ display:flex; gap:12px; align-items:center; margin-top:10px; }
+.primary-btn{ padding:8px 14px; border:1px solid #900; background:#900; color:#fff; border-radius:8px; }
+.link-btn{ background:none; border:none; color:#900; cursor:pointer; }
+.error{ color:#c00; margin-top:8px; }
 </style>
